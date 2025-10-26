@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Modern Web Gacha | SahrilModzz</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0320;
+      --panel:#160826;
+      --neon-cyan:#19f0ff;
+      --neon-pink:#ff39d9;
+      --muted:#cfc5de;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family: 'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: radial-gradient(800px 800px at 10% 10%, rgba(255,0,150,0.03), transparent),
+                  radial-gradient(600px 600px at 90% 90%, rgba(0,255,255,0.02), transparent),
+                  linear-gradient(180deg,var(--bg) 0%, #17042a 100%);
+      color:var(--muted);
+      -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+      padding:22px;display:flex;align-items:center;justify-content:center;
+    }
+
+    /* wrapper & card (keaslian tampilan) */
+    .wrap{width:100%;max-width:420px;position:relative;}
+    .logo{text-align:center;margin-top:6px;}
+    .logo .icon{width:62px;height:62px;margin:0 auto 6px;filter:drop-shadow(0 6px 14px rgba(255,0,200,0.12));}
+    h1{margin:0 0 8px 0;font-size:28px;letter-spacing:2px;color:white;text-shadow:0 0 18px rgba(255,255,255,0.06), 0 0 28px rgba(255,0,200,0.06);}
+    p.lead{margin:0 0 18px 0;color:#bbaed0;font-size:14px}
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.04);
+      padding:22px;border-radius:18px;
+      box-shadow:0 6px 40px rgba(0,0,0,0.6), inset 0 0 40px rgba(255,0,200,0.02);
+      backdrop-filter: blur(6px);position:relative;overflow:hidden;
+    }
+
+    .status{display:block;text-align:center;margin-bottom:12px;font-weight:700;color:var(--neon-cyan);text-shadow:0 6px 18px rgba(25,240,255,0.06);}
+    .desc{text-align:center;margin-bottom:12px;}
+    .spin-row{display:flex;flex-direction:column;gap:12px;align-items:center}
+    .spins-left{font-weight:700;color:#7fe6ff}
+
+    .btn{border:0;padding:14px 22px;border-radius:12px;font-weight:700;cursor:pointer;min-width:200px;
+      box-shadow:0 8px 28px rgba(0,0,0,0.5),0 0 28px rgba(0,0,0,0.35) inset;}
+    .btn-spin{background:var(--neon-pink);color:#1b0820;box-shadow:0 10px 40px rgba(255,57,217,0.12);font-size:16px;}
+    .btn-outline{background:transparent;border:2px solid rgba(25,240,255,0.18);color:var(--neon-cyan);padding:12px 18px;min-width:160px;}
+    .btn:active{transform:translateY(1px)}
+    footer{text-align:center;margin-top:20px;font-size:13px;color:#a18fb9}
+
+    .card::before{content:"";position:absolute;inset:6px;border-radius:14px;pointer-events:none;
+      box-shadow:0 0 40px rgba(255,57,217,0.06), 0 0 28px rgba(25,240,255,0.04) inset;border:1px solid rgba(25,240,255,0.04);}
+
+    /* menu button ujung kanan atas (sesuai request) */
+    #menuBtn{
+      position: fixed;
+      top: 8px;
+      right: 8px;
+      width: 46px;
+      height: 46px;
+      border-radius: 10px;
+      background: rgba(26,8,37,0.85);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: var(--neon-cyan);
+      font-size: 20px;
+      display: grid;place-items:center;
+      z-index:500;cursor:pointer;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+    }
+    #menuBtn:hover{ color:var(--neon-pink); transform:scale(1.03); }
+
+    .menu-panel{
+      display:none;
+      position: fixed;
+      top: 60px;
+      right: 8px;
+      background:#150923;
+      border:1px solid rgba(255,255,255,0.04);
+      padding:10px;border-radius:10px;
+      z-index:490;min-width:200px;box-shadow:0 12px 40px rgba(0,0,0,0.7);
+    }
+    .menu-panel.show{display:block}
+    .menu-panel .mp-row{display:flex;flex-direction:column;gap:8px}
+    .menu-panel .mp-row button{background:var(--neon-cyan);color:#120216;border:0;padding:8px 10px;border-radius:8px;font-weight:700;cursor:pointer}
+
+    /* modal solid */
+    .modal{
+      position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.96);min-width:280px;max-width:90%;
+      background:#180027;border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,0.04);display:none;z-index:250;
+      box-shadow:0 18px 80px rgba(0,0,0,0.85);
+    }
+    .modal.show{display:block;animation:pop .18s ease-out both}
+    @keyframes pop{to{transform:translate(-50%,-50%) scale(1)}}
+    .spin-anim{width:88px;height:88px;border-radius:50%;display:inline-grid;place-items:center;background:#25063d;border:3px solid rgba(255,255,255,0.06)}
+    .spinner{width:56px;height:56px;border-radius:50%;display:inline-block;position:relative}
+    .spinner:before{content:'';position:absolute;inset:0;border-radius:50%;border:4px solid rgba(255,255,255,0.06);border-top-color:var(--neon-pink);animation:spin 1.2s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .prize-name{font-weight:800;color:white;font-size:18px;margin-bottom:6px}
+    .prize-sub{font-size:13px;color:#b8a7cf;margin-bottom:12px}
+    @media (max-width:420px){h1{font-size:24px}}
+  </style>
+</head>
+<body>
+  <!-- menu tombol di pojok paling kanan atas -->
+  <button id="menuBtn" title="Menu">☰</button>
+  <div id="menuPanel" class="menu-panel" aria-hidden="true">
+    <div class="mp-row">
+      <button id="uploadBtn">📁 Tambah Hadiah</button>
+      <label style="font-size:12px;color:#cdb7e6;margin-top:6px">(Files disimpan di browser)</label>
+      <input id="fileInput" type="file" multiple accept="*/*" style="display:none" />
+    </div>
+  </div>
+
+  <div class="wrap" role="main">
+    <div class="logo">
+      <svg class="icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="64" height="64" rx="12" fill="#220324"/><path d="M40 18C40 18 45 20 48 26C51 32 49 38 44 42" stroke="url(#g)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="26" cy="34" r="10" stroke="url(#g)" stroke-width="3"></circle><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#19F0FF"/><stop offset="1" stop-color="#FF39D9"/></linearGradient></defs></svg>
+      <h1>MODERN WEB GACHA</h1>
+      <p class="lead">Sistem Gacha File Eksklusif. Tekan tombol untuk memulai.</p>
+    </div>
+
+    <div class="card" aria-live="polite">
+      <div class="status">SERVER: <span style="color:var(--neon-cyan);">AKTIF</span></div>
+      <div class="desc">WEB siap menarik Hadiah acak. Tekan 'SPIN' untuk memulai.</div>
+      <div class="spin-row">
+        <div class="spins-left">Sisa Spin: <span id="spinCount">9</span></div>
+        <button id="spinBtn" class="btn btn-spin">⚡ SPIN</button>
+        <div style="display:flex;gap:10px;margin-top:6px">
+          <button id="showPrizes" class="btn btn-outline">📋 LIHAT HADIAH</button>
+          <button id="showHistory" class="btn btn-outline">📜 LIHAT HISTORY</button>
+        </div>
+      </div>
+    </div>
+
+    <footer>© 2025 WEB GACHA SAHRILMODZZ | Design By SahrilModzz!!?| Neon Edition</footer>
+  </div>
+
+  <!-- modal -->
+  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div style="text-align:center">
+      <div class="spin-anim" id="spinAnim"><div class="spinner"></div></div>
+      <div style="margin-top:12px">
+        <div class="prize-name" id="prizeTitle">Selamat!</div>
+        <div class="prize-sub" id="prizeText">Anda mendapatkan...</div>
+        <div style="margin-top:10px"><button id="closeModal" class="btn btn-outline">Tutup</button></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Elements
+    const spinBtn = document.getElementById('spinBtn');
+    const spinCountEl = document.getElementById('spinCount');
+    const modal = document.getElementById('modal');
+    const closeModal = document.getElementById('closeModal');
+    const prizeTitle = document.getElementById('prizeTitle');
+    const prizeText = document.getElementById('prizeText');
+    const showPrizes = document.getElementById('showPrizes');
+    const showHistory = document.getElementById('showHistory');
+
+    const menuBtn = document.getElementById('menuBtn');
+    const menuPanel = document.getElementById('menuPanel');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const fileInput = document.getElementById('fileInput');
+
+    // localStorage keys
+    const KEY_PRIZES = 'jund_prizes_v1';
+    const KEY_HISTORY = 'jund_history_v1';
+    const KEY_SPINS = 'jund_spins_v1';
+
+    // state (load from localStorage or defaults)
+    let spins = parseInt(localStorage.getItem(KEY_SPINS)) || 9;
+    let prizes = JSON.parse(localStorage.getItem(KEY_PRIZES) || '[]');
+    let history = JSON.parse(localStorage.getItem(KEY_HISTORY) || '[]');
+
+    function saveAll(){
+      try {
+        localStorage.setItem(KEY_PRIZES, JSON.stringify(prizes));
+        localStorage.setItem(KEY_HISTORY, JSON.stringify(history));
+        localStorage.setItem(KEY_SPINS, String(spins));
+      } catch (e) {
+        console.warn('LocalStorage mungkin penuh atau file terlalu besar.', e);
+      }
+    }
+
+    function updateSpinDisplay(){ spinCountEl.textContent = spins; saveAll(); }
+
+    function randomPrize(){ return prizes[Math.floor(Math.random()*prizes.length)]; }
+
+    // helper: auto-download dataURL
+    function autoDownload(dataUrl, filename){
+      try {
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = filename || 'file';
+        // some browsers require anchor present in DOM
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      } catch (e) {
+        console.error('Auto-download gagal', e);
+        alert('⚠️ Gagal auto-download. Silakan klik link manual jika tersedia.');
+      }
+    }
+
+    // Spin handler
+    spinBtn.addEventListener('click', ()=>{
+      if (prizes.length === 0) {
+        alert('⚠️ Server sedang maintenance');
+        return;
+      }
+      if (spins <= 0) { alert('Maaf, sisa spin habis.'); return; }
+
+      spins -= 1; updateSpinDisplay();
+
+      // show modal spin
+      modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+      prizeTitle.textContent = 'Menarik hadiah...';
+      prizeText.textContent = 'Sedang memutar...';
+
+      setTimeout(()=>{
+        const p = randomPrize();
+        prizeTitle.textContent = p.name || 'Hadiah';
+        // if dataUrl present, show message and auto-download
+        if (p.dataUrl) {
+          prizeText.innerHTML = (p.desc ? p.desc + '<br>' : '') + `<span style="color:var(--neon-cyan);font-weight:700">File akan otomatis terunduh...</span>`;
+          // auto-download
+          autoDownload(p.dataUrl, p.name);
+        } else {
+          prizeText.textContent = p.desc || '';
+        }
+
+        // add to history (most recent first)
+        history.unshift({ time: new Date().toLocaleString(), prize: p.name || 'Hadiah' });
+        if (history.length > 200) history.length = 200;
+        saveAll();
+      }, 1100);
+    });
+
+    // close modal
+    closeModal?.addEventListener('click', ()=> {
+      modal.classList.remove('show'); modal.setAttribute('aria-hidden','true');
+    });
+
+    // open prizes modal (reuse modal UI)
+    showPrizes.addEventListener('click', ()=> openPrizesModal());
+
+    function openPrizesModal(){
+      if (prizes.length === 0) {
+        prizeTitle.textContent = 'Daftar Hadiah Kosong';
+        prizeText.innerHTML = '⚠️ Server sedang maintenance!';
+      } else {
+        prizeTitle.textContent = 'Daftar Hadiah';
+        // build list with download buttons (auto-download when clicked)
+        prizeText.innerHTML = prizes.map((p, idx) => {
+          const hasDL = p.dataUrl ? true : false;
+          const dlBtn = hasDL ? `<button data-idx="${idx}" class="dl-btn" style="margin-left:8px;background:transparent;border:0;color:var(--neon-cyan);font-weight:700;cursor:pointer">⬇️</button>` : '';
+          return `<div style="margin-bottom:6px"><strong>${p.name}</strong>${p.desc ? ' — '+p.desc : ''}${dlBtn}</div>`;
+        }).join('');
+        // attach click listeners to dynamic buttons
+        setTimeout(()=> {
+          document.querySelectorAll('.dl-btn').forEach(b=>{
+            b.onclick = (e)=>{
+              const i = parseInt(b.getAttribute('data-idx'));
+              const item = prizes[i];
+              if (item && item.dataUrl) autoDownload(item.dataUrl, item.name);
+            };
+          });
+        }, 30);
+      }
+      modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+    }
+
+    // show history
+    showHistory.addEventListener('click', ()=> openHistoryModal());
+    function openHistoryModal(){
+      if (history.length === 0) {
+        prizeTitle.textContent = 'History Kosong';
+        prizeText.textContent = 'Belum ada aktivitas gacha.';
+      } else {
+        prizeTitle.textContent = 'History Gacha';
+        prizeText.innerHTML = history.map((h,i)=> `<strong>#${i+1}</strong> ${h.time} — ${h.prize}`).join('<br>');
+      }
+      modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+    }
+
+    // menu toggles
+    menuBtn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      menuPanel.classList.toggle('show');
+    });
+
+    // upload flow (only "Tambah Hadiah")
+    uploadBtn.addEventListener('click', ()=> fileInput.click());
+    fileInput.addEventListener('change', (ev)=>{
+      const files = Array.from(ev.target.files || []);
+      if (!files.length) return;
+      let added = 0;
+      const readers = files.map(file => new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = () => {
+          // push prize with dataUrl
+          prizes.push({ name: file.name, desc: file.type || '', dataUrl: r.result });
+          added++;
+          res(true);
+        };
+        r.onerror = () => rej();
+        r.readAsDataURL(file);
+      }));
+      Promise.all(readers).then(()=>{
+        saveAll();
+        alert(`✅ ${added} hadiah berhasil ditambahkan!`);
+        menuPanel.classList.remove('show');
+      }).catch(()=>{
+        alert('⚠️ Gagal membaca file (mungkin terlalu besar).');
+      });
+      fileInput.value = '';
+    });
+
+    // clicking outside menu closes it, clicking outside modal closes it
+    window.addEventListener('click', (e)=>{
+      if (!menuPanel.contains(e.target) && e.target !== menuBtn) menuPanel.classList.remove('show');
+      if (e.target === modal) { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+    });
+
+    // prevent accidental file drag drop default
+    window.addEventListener('dragover', e => e.preventDefault());
+    window.addEventListener('drop', e => e.preventDefault());
+
+    // initialize UI
+    updateSpinDisplay();
+  </script>
+</body>
+</html>
